@@ -37,6 +37,10 @@ jobs:
       - name: Build docker image
         run: docker build -t lacework-demo-app:latest .
 
+      # Build my the app into a docker image
+      - name: env test
+        run: echo $LW_ACCOUNT_NAME
+
       # Scan the docker image for vulns
       - name: lacework vuln scan
         shell: bash
