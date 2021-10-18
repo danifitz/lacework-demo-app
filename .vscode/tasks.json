@@ -1,0 +1,54 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    // I stole this shamelessly from @automatecloud: https://raw.githubusercontent.com/automatecloud/my-tweet-app-lacework/master/.vscode/tasks.json
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Lacework: Build Docker image for vulnerability scanning (ARM)",
+            "type": "shell",
+            "command": "docker buildx build --platform=linux/amd64 -t ${workspaceFolderBasename}:lw-scanner -f Dockerfile ${workspaceFolder}"
+        },
+        {
+            "label": "Lacework: Build Docker image for vulnerability scanning (x86)",
+            "type": "docker-build",
+            "dockerBuild": {
+                "context": "${workspaceFolder}",
+                "dockerfile": "${workspaceFolder}/Dockerfile",
+                "tag": "${workspaceFolderBasename}:lw-scanner"
+            }
+        },
+        {
+            "label": "Lacework: Scan Docker image for vulnerabilities",
+            "type": "shell",
+            "command": "lw-scanner image evaluate ${workspaceFolderBasename} lw-scanner --scan-library-packages --html --html-file ./app/templates/lacework.html",
+            "problemMatcher": [],
+        },
+        {
+            "label": "Lacework: Delete Docker image for vulnerability scanning",
+            "type": "shell",
+            "command": "docker image rm --force ${workspaceFolderBasename}:lw-scanner",
+            "problemMatcher": [],
+        },
+        {
+            "label": "Lacework: Build, scan and delete Docker image for vulnerabilities (x86)",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Lacework: Build Docker image for vulnerability scanning (x86)",
+                "Lacework: Scan Docker image for vulnerabilities",
+                "Lacework: Delete Docker image for vulnerability scanning"
+            ]
+        },
+        {
+            "label": "Lacework: Build, scan and delete Docker image for vulnerabilities (ARM)",
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Lacework: Build Docker image for vulnerability scanning (ARM)",
+                "Lacework: Scan Docker image for vulnerabilities",
+                "Lacework: Delete Docker image for vulnerability scanning"
+            ]
+        }
+    ]
+}
