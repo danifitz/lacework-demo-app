@@ -25,7 +25,7 @@ jobs:
       LW_ACCOUNT_NAME: ${{ secrets.LW_ACCOUNT_NAME }}
       # Save the scan results in Lacework platform
       LW_SCANNER_SAVE_RESULTS: true
-      # Scan non-OS packages as well
+      # Scan non-OS packages as well 
       LW_SCANNER_SCAN_LIBRARY_PACKAGES: true
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -33,15 +33,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
+      # Build my the app into a docker image
       - name: Build docker image
         run: docker build -t lacework-demo-app:latest .
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
 
       # Scan the docker image for vulns
       - name: lacework vuln scan
@@ -52,24 +46,3 @@ jobs:
           curl -L https://github.com/lacework/lacework-vulnerability-scanner/releases/latest/download/lw-scanner-linux-amd64 -o lw-scanner
           chmod +x lw-scanner
           ./lw-scanner image evaluate lacework-demo-app latest --build-id ${{ github.run_id }}
-  # lacework_vuln_scan_job:
-  #   runs-on: ubuntu-18.04
-
-  #   env:
-  #     LW_ACCESS_TOKEN: ${{ secrets.LW_ACCESS_TOKEN }}
-  #     LW_ACCOUNT_NAME: ${{ secrets.LW_ACCOUNT_NAME }}
-
-  #   steps:
-  #     - name: pull
-  #       shell: bash
-  #       run: |
-  #         docker pull image_name:image_tag #Pull the image to scan
-
-  #     - name: scan
-  #       shell: bash
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get -y install curl
-  #         curl -L https://github.com/lacework/lacework-vulnerability-scanner/releases/latest/download/lw-scanner-linux-amd64 -o lw-scanner
-  #         chmod +x lw-scanner
-  #         ./lw-scanner image evaluate image_name image_tag --build-id ${{ github.run_id }}
